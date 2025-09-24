@@ -1,81 +1,45 @@
-// Configuration
-const PORTFOLIO = [
-  {
-    title: "YouTube - Hair Oil Edit", 
-    url: "https://youtube.com/watch?v=xxx",
-    category: "youtube",
-    image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-  },
-  {
-    title: "TikTok Viral Edit", 
-    url: "https://vm.tiktok.com/xxx",
-    category: "tiktok",
-    image: "https://images.unsplash.com/photo-1616469829476-8953c5655574?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-  },
-  {
-    title: "Reels - Before/After", 
-    url: "https://instagram.com/p/xxx",
-    category: "tiktok",
-    image: "https://images.unsplash.com/photo-1611746869696-4c17d1c11836?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-  },
-  {
-    title: "Commercial Ad - Tech Company", 
-    url: "https://vimeo.com/xxx",
-    category: "commercial",
-    image: "https://images.unsplash.com/photo-1579033386963-c9c471d8c444?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-  },
-  {
-    title: "Documentary Short Film", 
-    url: "https://youtube.com/watch?v=xxx",
-    category: "youtube",
-    image: "https://images.unsplash.com/photo-1591261730799-049e2bab5c7b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-  },
-  {
-    title: "Product Launch Video", 
-    url: "https://youtube.com/watch?v=xxx",
-    category: "commercial",
-    image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-  }
-];
-
-// DOM Elements
-const hamburger = document.querySelector(".hamburger");
-const navMenu = document.querySelector(".nav-menu");
-const themeToggle = document.getElementById("theme-toggle");
-const themeIcon = themeToggle.querySelector("i");
-const backToTopButton = document.querySelector(".back-to-top");
-const navbar = document.querySelector(".navbar");
-
-// Mobile Menu Toggle
-hamburger.addEventListener("click", () => {
-  hamburger.classList.toggle("active");
-  navMenu.classList.toggle("active");
-});
-
-// Close mobile menu when clicking on a nav link
-document.querySelectorAll(".nav-link").forEach(n => n.addEventListener("click", () => {
-  hamburger.classList.remove("active");
-  navMenu.classList.remove("active");
-}));
-
-// Theme Toggle
-themeToggle.addEventListener("click", () => {
-  document.body.classList.toggle("light-mode");
+// In your app.js, update the contact form handler:
+document.getElementById("contactForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData.entries());
   
-  if (document.body.classList.contains("light-mode")) {
-    themeIcon.classList.remove("fa-moon");
-    themeIcon.classList.add("fa-sun");
-    localStorage.setItem("theme", "light");
-  } else {
-    themeIcon.classList.remove("fa-sun");
-    themeIcon.classList.add("fa-moon");
-    localStorage.setItem("theme", "dark");
+  // Simple client-side validation
+  if (!data.name || !data.email || !data.message) {
+    alert("Please fill in all required fields.");
+    return;
   }
-});
-
-// Check for saved theme preference
-if (localStorage.getItem("theme") === "light") {
-  document.body.classList.add("light-mode");
+  
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(data.email)) {
+    alert("Please enter a valid email address.");
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    
+    const result = await response.json();
+    
+    if (result.ok) {
+      alert("✅ Message sent! I'll get back to you soon.");
+      form.reset();
+    } else {
+      alert(`⚠️ Error: ${result.error || 'There was an error sending your message.'}`);
+    }
+  } catch(err) { 
+    alert("⚠️ Network error. Please check your connection and try again."); 
+    console.error(err); 
+  }
+});  document.body.classList.add("light-mode");
   themeIcon.classList.remove("fa-moon");
   themeIcon.classList.add("fa-sun");
 }
